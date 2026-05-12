@@ -32,7 +32,7 @@ video_converter/
 
 ## ✨ Características Principales
 
-*   **🔄 Conversión Multi-formato**: Soporte para **MP4 (H.264), WEBM (VP9)** y conversión de imágenes a **AVIF (AV1)**.
+*   **🔄 Conversión Multi-formato**: Soporte para **MP4 (H.264), WEBM (VP9)** y **AV1 Video**.
 *   **📊 Análisis en Tiempo Real**: Doble barra de progreso (lote completo + archivo actual) con datos en tiempo real via Server-Sent Events (SSE).
 *   **📏 Redimensionamiento Adaptativo**: Opciones para sin resize, solo ancho (mantiene proporción) o tamaño W×H exacto.
 *   **⚡ Control de Calidad**: Ajuste de CRF (Constant Rate Factor) y velocidad de CPU para AV1.
@@ -66,7 +66,7 @@ Esta aplicación utiliza FFmpeg para el procesamiento de video e imágenes.
 |---------|-------|---------|-------|
 | MP4 | H.264 (libx264) | .mov .mp4 .avi .mkv .webm | CRF 0-51, recomendado 18-28 |
 | WEBM | VP9 (libvpx-vp9) | .mov .mp4 .avi .mkv .webm | CRF 0-63, recomendado 24-33 |
-| AVIF | AV1 (libaom-av1) | .jpg .jpeg .png .bmp .tiff .webp | Imágenes a AVIF, CRF 0-63 |
+| AV1 | AV1 (libaom-av1) | .mov .mp4 .avi .mkv .webm | Video AV1 (WebM), CRF 0-63 |
 
 ---
 

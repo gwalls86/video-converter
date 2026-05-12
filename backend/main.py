@@ -32,6 +32,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import uvicorn
 from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -78,18 +79,18 @@ FORMATS = {
         "extra":       "-b:v 0 -b:a 128k -row-mt 1 -deadline good -cpu-used 2",
         "input_exts":  [".mov", ".mp4", ".avi", ".mkv", ".webm"],
     },
-    "avif": {
-        "label":       "AVIF (AV1)",
-        "ext":         "avif",
+    "av1": {
+        "label":       "AV1 Video",
+        "ext":         "webm",
         "vcodec":      "libaom-av1",
-        "acodec":      None,
+        "acodec":      "libopus",
         "crf_min":     0,
         "crf_max":     63,
         "crf_default": 30,
-        "crf_info":    "AV1 usa CRF entre 0 (sin pérdida) y 63. Recomendado: 25–35.",
-        "is_image":    True,
-        "extra":       "-pix_fmt yuv420p -frames:v 1 -still-picture 1 -b:v 0",
-        "input_exts":  [".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".webp"],
+        "crf_info":    "AV1 usa CRF entre 0 y 63. Recomendado: 25–35.",
+        "is_image":    False,
+        "extra":       "-b:v 0 -row-mt 1 -deadline good",
+        "input_exts":  [".mov", ".mp4", ".avi", ".mkv", ".webm"],
     },
 }
 
@@ -232,8 +233,8 @@ def _build_ffmpeg_args(fmt: dict, cfg: VideoConverterConfig,
     args += ["-c:v", fmt["vcodec"]]
     args += ["-crf", str(cfg.crf)]
 
-    if fmt.get("format_id") == "avif" or cfg.format_id == "avif":
-        extra = f"-cpu-used {cfg.av1_cpu_speed} -pix_fmt yuv420p -frames:v 1 -still-picture 1 -b:v 0"
+    if fmt.get("format_id") == "av1" or cfg.format_id == "av1":
+        extra = f"-cpu-used {cfg.av1_cpu_speed} -pix_fmt yuv420p -b:v 0"
     else:
         extra = fmt["extra"]
     args += extra.split()
@@ -580,6 +581,10 @@ def select_folder():
     folder = filedialog.askdirectory()
     root.destroy()
     return {"folder": folder}
+
+
+# Servir Frontend
+app.mount("/", StaticFiles(directory="../frontend", html=True), name="frontend")
 
 
 @app.get("/api/events")

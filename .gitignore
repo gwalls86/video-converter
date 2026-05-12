@@ -8,9 +8,7 @@ __pycache__/
 
 # Carpetas de datos (específicas de la app)
 1-input/*
-!1-input/.gitkeep
 2-output/*
-!2-output/.gitkeep
 
 # Configuración local (contiene rutas absolutas)
 video_converter_config.json

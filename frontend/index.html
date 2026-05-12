@@ -856,10 +856,10 @@
             <div class="fmt-name">WEBM</div>
             <div class="fmt-codec">VP9</div>
           </div>
-          <div class="fmt-tab" :class="{ active: cfg.format_id === 'avif' }" @click="selectFormat('avif')">
-            <div class="fmt-icon">🖼️</div>
-            <div class="fmt-name">AVIF</div>
-            <div class="fmt-codec">AV1</div>
+          <div class="fmt-tab" :class="{ active: cfg.format_id === 'av1' }" @click="selectFormat('av1')">
+            <div class="fmt-icon">🎥</div>
+            <div class="fmt-name">AV1</div>
+            <div class="fmt-codec">Video</div>
           </div>
         </div>
         <div class="fmt-exts">Entrada: {{ currentFmt.input_exts?.join(', ') }}</div>
@@ -902,7 +902,7 @@
       </div>
 
       <!-- AV1 speed (solo si AVIF) -->
-      <div class="s-section" v-if="cfg.format_id === 'avif'">
+      <div class="s-section" v-if="cfg.format_id === 'av1'">
         <div class="s-label">Velocidad AV1</div>
         <div class="speed-row">
           <input type="range" min="0" max="8" v-model.number="cfg.av1_cpu_speed">
@@ -1056,7 +1056,7 @@
     const FORMATS_META = {
       mp4: { label: 'MP4 (H.264)', crf_min: 0, crf_max: 51, crf_default: 23, is_image: false, input_exts: ['.mov', '.mp4', '.avi', '.mkv', '.webm'], crf_info: 'H.264 recomienda CRF entre 18 y 28. Valor estándar: 23.' },
       webm: { label: 'WEBM (VP9)', crf_min: 0, crf_max: 63, crf_default: 30, is_image: false, input_exts: ['.mov', '.mp4', '.avi', '.mkv', '.webm'], crf_info: 'VP9 permite CRF entre 0 y 63. Recomendado: 24–33.' },
-      avif: { label: 'AVIF (AV1)', crf_min: 0, crf_max: 63, crf_default: 30, is_image: true, input_exts: ['.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.webp'], crf_info: 'AV1 usa CRF entre 0 y 63. Recomendado: 25–35.' },
+      av1: { label: 'AV1 Video', crf_min: 0, crf_max: 63, crf_default: 30, is_image: false, input_exts: ['.mov', '.mp4', '.avi', '.mkv', '.webm'], crf_info: 'AV1 usa CRF entre 0 y 63. Recomendado: 25–35.' },
     };
 
     createApp({
