@@ -583,9 +583,6 @@ def select_folder():
     return {"folder": folder}
 
 
-# Servir Frontend
-app.mount("/", StaticFiles(directory="../frontend", html=True), name="frontend")
-
 
 @app.get("/api/events")
 async def event_stream(request: Request):
@@ -604,6 +601,10 @@ async def event_stream(request: Request):
         "Cache-Control": "no-cache",
         "X-Accel-Buffering": "no",
     })
+
+# Servir Frontend
+frontend_dir = Path(__file__).parent.parent / "frontend"
+app.mount("/", StaticFiles(directory=str(frontend_dir), html=True), name="frontend")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
