@@ -1,6 +1,6 @@
 # Video Converter
 
-Una solución de escritorio elegante y potente para la conversión, redimensionamiento y optimización masiva de videos e imágenes. Esta versión utiliza una interfaz web moderna (Vue 3) conectada a un backend local (FastAPI), utilizando **FFmpeg** como motor de procesamiento.
+Una solución de escritorio elegante y potente para la conversión, redimensionamiento y optimización masiva de videos. Esta versión utiliza una interfaz web moderna (Vue 3) conectada a un backend local (FastAPI), utilizando **FFmpeg** como motor de procesamiento.
 
 ![Versión](https://img.shields.io/badge/version-1.0-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.8+-green.svg)
@@ -52,18 +52,20 @@ video_converter/
 ## 📋 Requisitos del Sistema
 
 ### 1. Python 3.8 o superior
-Asegúrate de tener Python instalado. Durante la instalación en Windows, marca la casilla **"Add Python to PATH"**.
+Asegúrate de tener Python instalado en tu computadora.
+*   **Importante**: Durante la instalación en Windows, asegúrate de marcar la casilla que dice **"Add Python to PATH"**.
 
-Instala las dependencias necesarias:
+#### Instalar dependencias
+Para que el script funcione, necesitas instalar un par de librerías. Abre una terminal (Símbolo del sistema / CMD en Windows) y ejecuta el siguiente comando:
 ```bash
 pip install fastapi uvicorn
 ```
 
-### 2. FFmpeg (El Motor)
-Esta aplicación utiliza FFmpeg para el procesamiento de video e imágenes.
-1. El proyecto está configurado por defecto para buscar FFmpeg en la carpeta `0-FFmpeg/bin/` en la raíz del proyecto.
-2. Si prefieres usar la versión del sistema, asegúrate de que `ffmpeg` y `ffprobe` estén en el PATH o actualiza la ruta en la interfaz web.
-3. **Instalación local**: Descarga los binarios de FFmpeg y coloca los ejecutables (`ffmpeg.exe`, `ffprobe.exe`) dentro de la carpeta `0-FFmpeg/bin/`.
+### 2. FFmpeg (El Motor de Procesamiento)
+Esta aplicación utiliza FFmpeg para procesar los videos.
+*   **Por defecto**: La aplicación intentará usar el comando `ffmpeg` del sistema (si está en el PATH).
+*   **Ruta Personalizada**: En la esquina inferior izquierda de la interfaz, puedes escribir la ruta exacta a `ffmpeg` y `ffprobe`.
+*   **Opción Recomendada**: Si no quieres instalarlo en el sistema, descarga los binarios y colócalos en `0-FFmpeg/bin/`. Luego, en la interfaz, usa rutas como `0-FFmpeg/bin/ffmpeg.exe` o la ruta absoluta completa.
 
 ---
 
@@ -79,31 +81,35 @@ Esta aplicación utiliza FFmpeg para el procesamiento de video e imágenes.
 
 ## 🚀 Cómo Usar
 
-1. **Coloca tus videos** en la carpeta `1-input/`.
-2. Elige una de las siguientes opciones para iniciar la aplicación:
+1. **Prepara tus archivos**: Coloca los videos que quieres convertir en la carpeta `1-input/` (o selecciona otra carpeta en la interfaz).
+2. **Inicia la aplicación**:
+   *   **En Windows**: Haz doble clic en el archivo **`start.bat`**. Esto abrirá la interfaz en tu navegador y encenderá el servidor automáticamente.
+   *   **Manual (Cualquier sistema)**: Abre una terminal en la carpeta del proyecto y ejecuta:
+       ```bash
+       cd backend
+       python main.py
+       ```
+       Luego abre tu navegador y ve a `http://localhost:8002`.
 
-### Opción A: Inicio Rápido (Recomendado)
-Simplemente haz doble clic en el archivo **`start.bat`**. Esto hará:
-1. Abrirá la interfaz web (`frontend/index.html`) en tu navegador predeterminado.
-2. Iniciará el servidor backend de Python.
-
-*Nota: También puedes acceder a la aplicación escribiendo `http://localhost:8002` en tu navegador una vez que el servidor esté corriendo.*
-
-### Opción B: Inicio Manual
-Si prefieres iniciarlo manualmente:
-1. Abre una terminal en la carpeta `backend` y ejecuta:
-   ```bash
-   python main.py
-   ```
-2. Abre el archivo `frontend/index.html` directamente en tu navegador o accede a `http://localhost:8002`.
-
-3. **Configura** las opciones en la interfaz web y presiona **"Iniciar conversión"**. Los resultados se guardarán en `2-output/`.
+3. **Configura y Convierte**:
+   *   **Carpetas**: Puedes hacer clic en los campos de ruta para abrir un selector nativo y elegir carpetas personalizadas.
+   *   **Formato**: Selecciona el formato deseado (MP4, WEBM o AV1).
+   *   **Calidad**: Ajusta el slider de CRF y otras opciones si lo deseas.
+   *   Presiona el botón **"Iniciar conversión"**.
+4. **Resultados**: Los videos convertidos aparecerán en la carpeta `2-output/` (o la que hayas seleccionado).
 
 ---
 
-## 🔌 API Endpoints
+## 📝 Notas
+- La configuración (rutas, formato, calidad) se guarda automáticamente en `backend/video_converter_config.json` al terminar una conversión.
+- El diálogo de selección de carpetas utiliza una ventana nativa (Tkinter) que se abrirá sobre tu navegador cuando hagas clic en el campo de ruta.
+- Para cerrar la aplicación correctamente, usa el botón **"Salir"** en la interfaz. Esto detendrá el servidor backend.
 
-El backend expone una API en `http://localhost:8002`:
+---
+
+## 🛠️ Información para Desarrolladores (API)
+
+El backend expone una API en `http://localhost:8002` que puedes usar para integrar con otras herramientas:
 
 | Método | Ruta | Descripción |
 |--------|------|-------------|
@@ -113,15 +119,9 @@ El backend expone una API en `http://localhost:8002`:
 | POST | `/api/start` | Inicia la conversión |
 | POST | `/api/stop` | Detiene la conversión |
 | GET | `/api/events` | Stream SSE de progreso en tiempo real |
-| GET | `/api/status` | Estado del worker |
+| GET | `/api/status` | Estado del worker (si está corriendo) |
 | POST | `/api/shutdown` | Apaga el servidor backend |
 | GET | `/api/select-folder` | Abre diálogo para seleccionar carpeta |
-
----
-
-## 📝 Notas
-- La configuración se guarda automáticamente en `backend/video_converter_config.json`.
-- El diálogo de selección de carpetas utiliza una ventana nativa (Tkinter) que se abrirá sobre tu navegador cuando hagas clic en seleccionar carpeta.
 
 ---
 *Desarrollado por **gwalls86***
