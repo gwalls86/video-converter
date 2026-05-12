@@ -21,8 +21,15 @@ Una solución de escritorio elegante y potente para la conversión, redimensiona
 
 ```
 video_converter/
+├── 0-FFmpeg/            ← Coloca aquí los binarios de FFmpeg (opcional)
+│   └── bin/
+│       ├── ffmpeg.exe
+│       └── ffprobe.exe
+├── 1-input/             ← Carpeta por defecto para tus videos originales
+├── 2-output/            ← Carpeta donde se guardarán los videos convertidos
 ├── backend/
-│   └── main.py          ← Servidor FastAPI (puerto 8002)
+│   ├── main.py          ← Servidor FastAPI (puerto 8002)
+│   └── video_converter_config.json ← Configuración guardada
 ├── frontend/
 │   └── index.html       ← Interfaz de usuario (Vue 3)
 └── start.bat            ← Script de inicio rápido
@@ -72,10 +79,15 @@ Esta aplicación utiliza FFmpeg para el procesamiento de video e imágenes.
 
 ## 🚀 Cómo Usar
 
+1. **Coloca tus videos** en la carpeta `1-input/`.
+2. Elige una de las siguientes opciones para iniciar la aplicación:
+
 ### Opción A: Inicio Rápido (Recomendado)
-Simplemente haz doble clic en el archivo **`start.bat`**. Esto hará dos cosas:
+Simplemente haz doble clic en el archivo **`start.bat`**. Esto hará:
 1. Abrirá la interfaz web (`frontend/index.html`) en tu navegador predeterminado.
 2. Iniciará el servidor backend de Python.
+
+*Nota: También puedes acceder a la aplicación escribiendo `http://localhost:8002` en tu navegador una vez que el servidor esté corriendo.*
 
 ### Opción B: Inicio Manual
 Si prefieres iniciarlo manualmente:
@@ -83,7 +95,9 @@ Si prefieres iniciarlo manualmente:
    ```bash
    python main.py
    ```
-2. Abre el archivo `frontend/index.html` directamente en tu navegador.
+2. Abre el archivo `frontend/index.html` directamente en tu navegador o accede a `http://localhost:8002`.
+
+3. **Configura** las opciones en la interfaz web y presiona **"Iniciar conversión"**. Los resultados se guardarán en `2-output/`.
 
 ---
 
