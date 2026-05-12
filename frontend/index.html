@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Converter</title>
+  <link rel="icon" type="image/png" href="icon.png">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #09090b;
+      --bg1: #0f0f12;
+      --bg2: #161619;
+      --bg3: #1c1c21;
+      --bg4: #222228;
+      --border: rgba(255, 255, 255, 0.055);
+      --border2: rgba(255, 255, 255, 0.10);
+      --text: #f0f0f8;
+      --text2: #80809a;
+      --text3: #44445a;
+      --teal: #2dd4bf;
+      --teal-dim: rgba(45, 212, 191, 0.10);
+      --amber: #fbbf24;
+      --amber-dim: rgba(251, 191, 36, 0.10);
+      --green: #4ade80;
+      --green-dim: rgba(74, 222, 128, 0.08);
+      --red: #f87171;
+      --red-dim: rgba(248, 113, 113, 0.10);
+      --violet: #a78bfa;
+      --violet-dim: rgba(167, 139, 250, 0.10);
+      --blue: #60a5fa;
+      --blue-dim: rgba(96, 165, 250, 0.10);
+    }
+
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+    }
+
+    #app {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 360px;
+      flex-shrink: 0;
+      background: var(--bg1);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .sidebar::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+      background: var(--bg4);
+      border-radius: 2px;
+    }
+
+    .logo {
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #2dd4bf 0%, #a78bfa 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      flex-shrink: 0;
+    }
+
+    .logo-name {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .logo-sub {
+      font-size: 10px;
+      color: var(--text3);
+      font-family: 'DM Mono', monospace;
+      margin-top: 1px;
+    }
+
+    .s-section {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .s-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 10px;
+    }
+
+    /* paths */
+    .path-field {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+      margin-bottom: 5px;
+    }
+
+    .path-field:hover {
+      border-color: var(--border2);
+    }
+
+    .path-icon {
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .path-text {
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      color: var(--text2);
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .path-edit {
+      font-size: 10px;
+      color: var(--teal);
+      flex-shrink: 0;
+      font-weight: 600;
+    }
+
+    .edit-wrap {
+      display: none;
+      margin-top: 5px;
+    }
+
+    .edit-wrap.open {
+      display: block;
+    }
+
+    input[type=text],
+    input[type=number] {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      padding: 7px 10px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input[type=text]:focus,
+    input[type=number]:focus {
+      border-color: var(--teal);
+    }
+
+    /* format tabs */
+    .fmt-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+    }
+
+    .fmt-tab {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .fmt-tab:hover {
+      border-color: var(--border2);
+    }
+
+    .fmt-tab.active {
+      background: var(--teal-dim);
+      border-color: var(--teal);
+    }
+
+    .fmt-icon {
+      font-size: 20px;
+      margin-bottom: 5px;
+    }
+
+    .fmt-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text2);
+      letter-spacing: 0.02em;
+    }
+
+    .fmt-tab.active .fmt-name {
+      color: var(--teal);
+    }
+
+    .fmt-codec {
+      font-size: 10px;
+      color: var(--text3);
+      font-family: 'DM Mono', monospace;
+      margin-top: 2px;
+    }
+
+    .fmt-exts {
+      font-size: 10px;
+      color: var(--text3);
+      margin-top: 8px;
+      line-height: 1.5;
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* CRF slider */
+    .crf-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 8px 0 4px;
+    }
+
+    .crf-label {
+      font-size: 12px;
+      color: var(--text2);
+    }
+
+    .crf-val {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--teal);
+      font-family: 'DM Mono', monospace;
+      min-width: 28px;
+      text-align: right;
+    }
+
+    input[type=range] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 3px;
+      background: var(--bg4);
+      border-radius: 2px;
+      outline: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--teal);
+      cursor: pointer;
+      border: 2px solid var(--bg1);
+    }
+
+    .crf-hint {
+      font-size: 11px;
+      color: var(--text3);
+      line-height: 1.5;
+    }
+
+    /* resize */
+    .resize-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+
+    .resize-tab {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 7px 4px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 11px;
+      color: var(--text2);
+      font-weight: 500;
+    }
+
+    .resize-tab:hover {
+      border-color: var(--border2);
+    }
+
+    .resize-tab.active {
+      background: var(--violet-dim);
+      border-color: var(--violet);
+      color: var(--violet);
+    }
+
+    .resize-dims {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .resize-dims input {
+      width: 70px;
+      flex-shrink: 0;
+    }
+
+    .resize-dims span {
+      font-size: 12px;
+      color: var(--text3);
+    }
+
+    .resize-dims .sep {
+      font-size: 14px;
+      color: var(--text3);
+    }
+
+    /* AV1 speed */
+    .speed-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .speed-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--amber);
+      font-family: 'DM Mono', monospace;
+      min-width: 20px;
+      text-align: right;
+    }
+
+    .speed-hint {
+      font-size: 10px;
+      color: var(--text3);
+      margin-top: 4px;
+    }
+
+    /* toggles */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .toggle-row:last-child {
+      border-bottom: none;
+    }
+
+    .t-label {
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .t-sub {
+      font-size: 10px;
+      color: var(--text3);
+      margin-top: 1px;
+    }
+
+    .toggle {
+      width: 32px;
+      height: 17px;
+      border-radius: 9px;
+      background: var(--bg4);
+      border: 1px solid var(--border2);
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .toggle.on {
+      background: var(--teal);
+      border-color: var(--teal);
+    }
+
+    .toggle::after {
+      content: '';
+      position: absolute;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: white;
+      top: 2px;
+      left: 2px;
+      transition: left 0.2s;
+    }
+
+    .toggle.on::after {
+      left: 17px;
+    }
+
+    /* ffmpeg paths */
+    .tool-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-top: 5px;
+    }
+
+    .tool-badge {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .tool-badge.ok {
+      background: var(--green-dim);
+      color: var(--green);
+    }
+
+    .tool-badge.err {
+      background: var(--red-dim);
+      color: var(--red);
+    }
+
+    .btn-sm {
+      padding: 5px 11px;
+      font-size: 11px;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+    }
+
+    .btn-sm:hover {
+      border-color: var(--text3);
+      color: var(--text);
+    }
+
+    /* ── MAIN ── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .main-header {
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .main-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+    }
+
+    .main-sub {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 3px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .state-pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 11px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .state-pill.idle {
+      background: var(--bg3);
+      color: var(--text3);
+    }
+
+    .state-pill.running {
+      background: var(--teal-dim);
+      color: var(--teal);
+    }
+
+    .state-pill.done {
+      background: var(--green-dim);
+      color: var(--green);
+    }
+
+    .state-pill.error {
+      background: var(--red-dim);
+      color: var(--red);
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .spin {
+      display: inline-block;
+      animation: spin 1s linear infinite;
+    }
+
+    /* stats */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat {
+      background: var(--bg);
+      padding: 13px 20px;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    .stat-val {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 3px 0 2px;
+      letter-spacing: -0.5px;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+    }
+
+    .stat-val.teal {
+      color: var(--teal);
+    }
+
+    .stat-val.red {
+      color: var(--red);
+    }
+
+    .stat-val.amber {
+      color: var(--amber);
+    }
+
+    .stat-sub {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    /* dual progress */
+    .progress-section {
+      padding: 14px 22px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .prog-block {}
+
+    .prog-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .prog-label {
+      font-size: 11px;
+      color: var(--text2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 76%;
+    }
+
+    .prog-caption {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text3);
+      font-family: 'DM Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .prog-frac {
+      font-size: 11px;
+      color: var(--text3);
+      font-family: 'DM Mono', monospace;
+      flex-shrink: 0;
+    }
+
+    .prog-track {
+      height: 3px;
+      background: var(--bg3);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .prog-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.25s ease;
+    }
+
+    .prog-fill.batch {
+      background: var(--teal);
+    }
+
+    .prog-fill.file {
+      background: var(--violet);
+    }
+
+    /* log */
+    .log-wrap {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .log-header {
+      padding: 9px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .log-title {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    .log-clear {
+      font-size: 11px;
+      color: var(--text3);
+      cursor: pointer;
+    }
+
+    .log-clear:hover {
+      color: var(--text2);
+    }
+
+    .log-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 22px 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      line-height: 1.9;
+    }
+
+    .log-body::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    .log-body::-webkit-scrollbar-thumb {
+      background: var(--bg4);
+      border-radius: 2px;
+    }
+
+    .log-line {
+      display: flex;
+      gap: 12px;
+    }
+
+    .log-ts {
+      color: var(--text3);
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .log-msg {
+      word-break: break-all;
+    }
+
+    .log-msg.SUCCESS {
+      color: var(--green);
+    }
+
+    .log-msg.ERROR {
+      color: var(--red);
+    }
+
+    .log-msg.WARNING {
+      color: var(--amber);
+    }
+
+    .log-msg.INFO {
+      color: var(--text2);
+    }
+
+    .log-msg.DIM {
+      color: var(--text3);
+    }
+
+    .log-empty {
+      color: var(--text3);
+      font-size: 12px;
+      text-align: center;
+      padding: 28px 0;
+    }
+
+    /* action bar */
+    .action-bar {
+      padding: 12px 22px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border-radius: 7px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: var(--teal);
+      color: #09090b;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      filter: brightness(1.1);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .btn-stop {
+      background: transparent;
+      border: 1px solid rgba(248, 113, 113, 0.3);
+      color: var(--red);
+      padding: 10px 16px;
+    }
+
+    .btn-stop:hover:not(:disabled) {
+      background: var(--red-dim);
+    }
+
+    .btn-stop:disabled {
+      opacity: 0.2;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+
+    <!-- ── SIDEBAR ─────────────────────────────────────────────────────────── -->
+    <div class="sidebar">
+      <div class="logo">
+        <div class="logo-icon"><img src="icon.png" style="width: 36px; height: 36px;"></div>
+        <div>
+          <div class="logo-name">Video Converter</div>
+          <div class="logo-sub">Powered by gwalls86</div>
+        </div>
+      </div>
+
+      <!-- Carpetas -->
+      <div class="s-section">
+        <div class="s-label">Carpetas</div>
+        <div class="path-field" @click="openFolderPicker('input')">
+          <span class="path-icon">📂</span>
+          <span class="path-text">{{ cfg.input_dir || 'Sin seleccionar' }}</span>
+          <!-- <span class="path-edit" @click.stop="toggleEdit('input')">editar</span> -->
+        </div>
+        <div class="edit-wrap" :class="{ open: editOpen.input }">
+          <input type="text" v-model="cfg.input_dir" placeholder="Ruta de entrada..."
+            @keydown.enter="toggleEdit('input')">
+        </div>
+        <div class="path-field" @click="openFolderPicker('output')">
+          <span class="path-icon">📁</span>
+          <span class="path-text">{{ cfg.output_dir || 'Sin seleccionar' }}</span>
+          <!-- <span class="path-edit" @click.stop="toggleEdit('output')">editar</span> -->
+        </div>
+        <div class="edit-wrap" :class="{ open: editOpen.output }">
+          <input type="text" v-model="cfg.output_dir" placeholder="Ruta de salida..."
+            @keydown.enter="toggleEdit('output')">
+        </div>
+      </div>
+
+      <!-- Formato -->
+      <div class="s-section">
+        <div class="s-label">Formato de salida</div>
+        <div class="fmt-tabs">
+          <div class="fmt-tab" :class="{ active: cfg.format_id === 'mp4' }" @click="selectFormat('mp4')">
+            <div class="fmt-icon">🎥</div>
+            <div class="fmt-name">MP4</div>
+            <div class="fmt-codec">H.264</div>
+          </div>
+          <div class="fmt-tab" :class="{ active: cfg.format_id === 'webm' }" @click="selectFormat('webm')">
+            <div class="fmt-icon">🌐</div>
+            <div class="fmt-name">WEBM</div>
+            <div class="fmt-codec">VP9</div>
+          </div>
+          <div class="fmt-tab" :class="{ active: cfg.format_id === 'avif' }" @click="selectFormat('avif')">
+            <div class="fmt-icon">🖼️</div>
+            <div class="fmt-name">AVIF</div>
+            <div class="fmt-codec">AV1</div>
+          </div>
+        </div>
+        <div class="fmt-exts">Entrada: {{ currentFmt.input_exts?.join(', ') }}</div>
+      </div>
+
+      <!-- CRF -->
+      <div class="s-section">
+        <div class="s-label">Calidad — CRF</div>
+        <div class="crf-row">
+          <span class="crf-label">CRF</span>
+          <input type="range" :min="currentFmt.crf_min" :max="currentFmt.crf_max" v-model.number="cfg.crf">
+          <span class="crf-val">{{ cfg.crf }}</span>
+        </div>
+        <div class="crf-hint">{{ currentFmt.crf_info }}</div>
+      </div>
+
+      <!-- Redimensionar -->
+      <div class="s-section">
+        <div class="s-label">Redimensionar</div>
+        <div class="resize-tabs">
+          <div class="resize-tab" :class="{ active: cfg.resize_mode === 'none' }" @click="cfg.resize_mode = 'none'">Sin
+            resize</div>
+          <div class="resize-tab" :class="{ active: cfg.resize_mode === 'width' }" @click="cfg.resize_mode = 'width'">
+            Solo ancho</div>
+          <div class="resize-tab" :class="{ active: cfg.resize_mode === 'both' }" @click="cfg.resize_mode = 'both'">W ×
+            H</div>
+        </div>
+        <div class="resize-dims" v-if="cfg.resize_mode !== 'none'">
+          <input type="number" v-model.number="cfg.resize_width" min="1" max="7680" placeholder="ancho">
+          <span>px</span>
+          <template v-if="cfg.resize_mode === 'both'">
+            <span class="sep">×</span>
+            <input type="number" v-model.number="cfg.resize_height" min="1" max="4320" placeholder="alto">
+            <span>px</span>
+          </template>
+          <template v-else>
+            <span style="font-size:11px;color:var(--text3)">— mantiene proporción</span>
+          </template>
+        </div>
+      </div>
+
+      <!-- AV1 speed (solo si AVIF) -->
+      <div class="s-section" v-if="cfg.format_id === 'avif'">
+        <div class="s-label">Velocidad AV1</div>
+        <div class="speed-row">
+          <input type="range" min="0" max="8" v-model.number="cfg.av1_cpu_speed">
+          <span class="speed-val">{{ cfg.av1_cpu_speed }}</span>
+        </div>
+        <div class="speed-hint">0 = más lento / mejor calidad — 8 = más rápido / menor calidad</div>
+      </div>
+
+      <!-- Opciones -->
+      <div class="s-section">
+        <div class="s-label">Opciones</div>
+        <div class="toggle-row" v-if="!currentFmt.is_image">
+          <div>
+            <div class="t-label">Eliminar audio</div>
+            <div class="t-sub">-an en FFmpeg</div>
+          </div>
+          <div class="toggle" :class="{ on: cfg.remove_audio }" @click="cfg.remove_audio = !cfg.remove_audio"></div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="t-label">Sobreescribir existentes</div>
+          </div>
+          <div class="toggle" :class="{ on: cfg.overwrite_all }" @click="cfg.overwrite_all = !cfg.overwrite_all"></div>
+        </div>
+        <div class="toggle-row" style="border:none">
+          <div>
+            <div class="t-label">Abrir carpeta al terminar</div>
+          </div>
+          <div class="toggle" :class="{ on: cfg.open_output }" @click="cfg.open_output = !cfg.open_output"></div>
+        </div>
+      </div>
+
+      <!-- FFmpeg paths -->
+      <div class="s-section">
+        <div class="s-label">FFmpeg</div>
+        <div style="margin-bottom:6px">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">ffmpeg</div>
+          <input type="text" v-model="cfg.ffmpeg_path" placeholder="ffmpeg o ruta completa">
+        </div>
+        <div style="margin-bottom:6px">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">ffprobe</div>
+          <input type="text" v-model="cfg.ffprobe_path" placeholder="ffprobe o ruta completa">
+        </div>
+        <div class="tool-row">
+          <button class="btn-sm" @click="checkFFmpeg">Verificar</button>
+          <span v-if="ffmpegStatus" class="tool-badge" :class="ffmpegStatus.ok ? 'ok' : 'err'">
+            {{ ffmpegStatus.ok ? '✓ detectado' : '✗ no encontrado' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MAIN ─────────────────────────────────────────────────────────────── -->
+    <div class="main">
+      <div class="main-header">
+        <div>
+          <div class="main-title">{{ mainTitle }}</div>
+          <div class="main-sub">{{ mainSub }}</div>
+        </div>
+        <div class="state-pill" :class="state">
+          <span v-if="state === 'running'" class="spin">⟳</span>
+          <span v-else-if="state === 'done'">✓</span>
+          <span v-else-if="state === 'error'">✗</span>
+          {{ { idle: 'En espera', running: 'Convirtiendo', done: 'Completado', error: 'Error' }[state] }}
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-label">Convertidos</div>
+          <div class="stat-val teal">{{ stats.converted }}</div>
+          <div class="stat-sub">de {{ stats.total || '–' }} archivos</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Omitidos</div>
+          <div class="stat-val amber">{{ stats.skipped }}</div>
+          <div class="stat-sub">ya existían</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Errores</div>
+          <div class="stat-val" :class="stats.errors > 0 ? 'red' : ''">{{ stats.errors }}</div>
+          <div class="stat-sub">archivos fallidos</div>
+        </div>
+      </div>
+
+      <!-- Dual progress bars -->
+      <div class="progress-section">
+        <!-- Batch progress -->
+        <div class="prog-block">
+          <div class="prog-meta">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="prog-caption">Lote</span>
+              <span class="prog-label">{{ progress.label || 'En espera…' }}</span>
+            </div>
+            <span class="prog-frac">{{ progress.total ? progress.current + ' / ' + progress.total : '0 / 0' }}</span>
+          </div>
+          <div class="prog-track">
+            <div class="prog-fill batch" :style="{ width: batchPct + '%' }"></div>
+          </div>
+        </div>
+        <!-- File progress -->
+        <div class="prog-block">
+          <div class="prog-meta">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="prog-caption" style="color:var(--violet)">Archivo</span>
+              <span class="prog-label">{{ fileProgress.label || (state === 'running' ? 'Procesando…' : '—') }}</span>
+            </div>
+            <span class="prog-frac" style="color:var(--violet)">{{ fileProgress.label || '' }}</span>
+          </div>
+          <div class="prog-track">
+            <div class="prog-fill file" :style="{ width: filePct + '%' }"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Log -->
+      <div class="log-wrap">
+        <div class="log-header">
+          <span class="log-title">Actividad</span>
+          <span class="log-clear" @click="logs = []">limpiar</span>
+        </div>
+        <div class="log-body" ref="logBody">
+          <div v-if="logs.length === 0" class="log-empty">
+            Sin actividad · configura las carpetas y presiona Iniciar
+          </div>
+          <div v-for="(line, i) in logs" :key="i" class="log-line">
+            <span class="log-ts">{{ line.ts }}</span>
+            <span class="log-msg" :class="line.level">{{ line.message }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="action-bar">
+        <button class="btn btn-primary" :disabled="state === 'running'" @click="startConversion">
+          <span v-if="state !== 'running'">▶ Iniciar conversión</span>
+          <span v-else><span class="spin">⟳</span> Convirtiendo…</span>
+        </button>
+        <button class="btn btn-stop" :disabled="state !== 'running'" @click="stopConversion">⬛ Detener</button>
+        <button class="btn btn-stop" @click="exitApp">🚪 Salir</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref, reactive, computed, onMounted, nextTick } = Vue;
+
+    const API = 'http://localhost:8002/api';
+
+    const FORMATS_META = {
+      mp4: { label: 'MP4 (H.264)', crf_min: 0, crf_max: 51, crf_default: 23, is_image: false, input_exts: ['.mov', '.mp4', '.avi', '.mkv', '.webm'], crf_info: 'H.264 recomienda CRF entre 18 y 28. Valor estándar: 23.' },
+      webm: { label: 'WEBM (VP9)', crf_min: 0, crf_max: 63, crf_default: 30, is_image: false, input_exts: ['.mov', '.mp4', '.avi', '.mkv', '.webm'], crf_info: 'VP9 permite CRF entre 0 y 63. Recomendado: 24–33.' },
+      avif: { label: 'AVIF (AV1)', crf_min: 0, crf_max: 63, crf_default: 30, is_image: true, input_exts: ['.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.webp'], crf_info: 'AV1 usa CRF entre 0 y 63. Recomendado: 25–35.' },
+    };
+
+    createApp({
+      setup() {
+        const cfg = reactive({
+          input_dir: '',
+          output_dir: '',
+          ffmpeg_path: 'ffmpeg',
+          ffprobe_path: 'ffprobe',
+          format_id: 'mp4',
+          crf: 23,
+          remove_audio: false,
+          resize_mode: 'none',
+          resize_width: 1280,
+          resize_height: 720,
+          av1_cpu_speed: 4,
+          overwrite_all: false,
+          open_output: false,
+        });
+
+        const state = ref('idle');
+        const logs = ref([]);
+        const progress = reactive({ current: 0, total: 0, label: '' });
+        const fileProgress = reactive({ pct: 0, label: '' });
+        const stats = reactive({ converted: 0, skipped: 0, errors: 0, total: 0, current: 0 });
+        const ffmpegStatus = ref(null);
+        const editOpen = reactive({ input: false, output: false });
+        const logBody = ref(null);
+        let eventSource = null;
+
+        const currentFmt = computed(() => FORMATS_META[cfg.format_id] || FORMATS_META.mp4);
+
+        const batchPct = computed(() =>
+          progress.total ? Math.round((progress.current / progress.total) * 100) : 0
+        );
+        const filePct = computed(() => Math.round((fileProgress.pct || 0) * 100));
+
+        const mainTitle = computed(() => ({
+          idle: 'Listo para convertir', running: 'Convirtiendo videos',
+          done: 'Conversión completada', error: 'Error en la conversión'
+        }[state.value]));
+
+        const mainSub = computed(() => {
+          if (state.value === 'idle') return 'Configura carpetas y formato, luego presiona Iniciar';
+          if (state.value === 'running') return `${currentFmt.value.label}  ·  CRF ${cfg.crf}${cfg.resize_mode !== 'none' ? '  ·  resize' : ''}`;
+          if (state.value === 'done') return `${stats.converted} convertidos · ${stats.skipped} omitidos · ${stats.errors} errores`;
+          return 'Revisa el log para ver detalles';
+        });
+
+        function selectFormat(fid) {
+          cfg.format_id = fid;
+          const fmt = FORMATS_META[fid];
+          if (fmt && (cfg.crf < fmt.crf_min || cfg.crf > fmt.crf_max)) {
+            cfg.crf = fmt.crf_default;
+          }
+        }
+
+        function toggleEdit(field) { editOpen[field] = !editOpen[field]; }
+
+        async function openFolderPicker(field) {
+          try {
+            const res = await fetch(`${API}/select-folder`);
+            const data = await res.json();
+            if (data.folder) {
+              cfg[field === 'input' ? 'input_dir' : 'output_dir'] = data.folder;
+            }
+          } catch (err) {
+            addLog('Error al abrir el selector de carpetas', 'ERROR');
+          }
+        }
+
+        async function exitApp() {
+          if (confirm('¿Estás seguro de que quieres cerrar la aplicación?')) {
+            try {
+              await fetch(`${API}/shutdown`, { method: 'POST' });
+            } catch { }
+            window.close();
+          }
+        }
+
+        function addLog(message, level = 'INFO', ts = null) {
+          logs.value.push({ message, level, ts: ts || new Date().toLocaleTimeString('es-CO', { hour12: false }) });
+          nextTick(() => { if (logBody.value) logBody.value.scrollTop = logBody.value.scrollHeight; });
+        }
+
+        async function checkFFmpeg() {
+          ffmpegStatus.value = null;
+          try {
+            const res = await fetch(`${API}/status`);
+            ffmpegStatus.value = { ok: res.ok };
+          } catch { ffmpegStatus.value = { ok: false }; }
+        }
+
+        async function loadConfig() {
+          try {
+            const res = await fetch(`${API}/config`);
+            const data = await res.json();
+            const src = data.input_dir !== undefined ? data : (data.converter || {});
+            if (src.input_dir !== undefined) Object.assign(cfg, src);
+          } catch { }
+        }
+
+        async function saveConfig() {
+          try {
+            await fetch(`${API}/config`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ config: { ...cfg } }),
+            });
+          } catch { }
+        }
+
+        function connectSSE() {
+          if (eventSource) { eventSource.close(); eventSource = null; }
+          eventSource = new EventSource(`${API}/events`);
+          eventSource.onmessage = (e) => {
+            const { type, payload } = JSON.parse(e.data);
+            if (type === 'log') addLog(payload.message, payload.level, payload.ts);
+            else if (type === 'progress') Object.assign(progress, payload);
+            else if (type === 'file_progress') Object.assign(fileProgress, payload);
+            else if (type === 'stats') Object.assign(stats, payload);
+            else if (type === 'done') {
+              state.value = payload.success ? 'done' : 'error';
+              saveConfig();
+            }
+          };
+        }
+
+        async function startConversion() {
+          if (!cfg.input_dir || !cfg.output_dir) {
+            addLog('Debes configurar las carpetas de entrada y salida.', 'ERROR');
+            return;
+          }
+          logs.value = [];
+          Object.assign(stats, { converted: 0, skipped: 0, errors: 0, total: 0, current: 0 });
+          Object.assign(progress, { current: 0, total: 0, label: '' });
+          Object.assign(fileProgress, { pct: 0, label: '' });
+          state.value = 'running';
+
+          try {
+            const res = await fetch(`${API}/start`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ...cfg }),
+            });
+            const data = await res.json();
+            if (!data.ok) { addLog(data.error || 'Error al iniciar', 'ERROR'); state.value = 'error'; }
+          } catch {
+            addLog('No se puede conectar al backend. ¿Está corriendo main.py?', 'ERROR');
+            state.value = 'error';
+          }
+        }
+
+        async function stopConversion() {
+          try { await fetch(`${API}/stop`, { method: 'POST' }); } catch { }
+        }
+
+        onMounted(() => { loadConfig(); connectSSE(); });
+
+        return {
+          cfg, state, logs, progress, fileProgress, stats, ffmpegStatus, editOpen, logBody,
+          currentFmt, batchPct, filePct, mainTitle, mainSub,
+          selectFormat, toggleEdit, checkFFmpeg, startConversion, stopConversion,
+          openFolderPicker, exitApp,
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+
+</html>
