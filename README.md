@@ -38,6 +38,7 @@ video_converter/
 *   **⚡ Control de Calidad**: Ajuste de CRF (Constant Rate Factor) y velocidad de CPU para AV1.
 *   **🛠️ Control Total**: Opciones para eliminar audio, sobreescribir existentes y abrir carpeta al terminar.
 *   **📝 Registro Detallado**: Log guardado automáticamente en la carpeta de salida (`conversion_log.txt`).
+*   **📉 Métrica de Eficiencia**: Calcula y muestra el porcentaje de reducción de tamaño tras la conversión.
 
 ---
 
@@ -55,6 +56,7 @@ pip install fastapi uvicorn
 Esta aplicación utiliza FFmpeg para el procesamiento de video e imágenes.
 1. El proyecto está configurado por defecto para buscar FFmpeg en la carpeta `0-FFmpeg/bin/` en la raíz del proyecto.
 2. Si prefieres usar la versión del sistema, asegúrate de que `ffmpeg` y `ffprobe` estén en el PATH o actualiza la ruta en la interfaz web.
+3. **Instalación local**: Descarga los binarios de FFmpeg y coloca los ejecutables (`ffmpeg.exe`, `ffprobe.exe`) dentro de la carpeta `0-FFmpeg/bin/`.
 
 ---
 
